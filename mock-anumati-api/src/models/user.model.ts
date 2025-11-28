@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import { User, Dependent, CreditCard, PreciousMetals } from '../types';
 
-export interface UserDocument extends Omit<User, 'id' | 'createdAt'>, Document {}
+export interface UserDocument extends Omit<User, 'id' | '_id' | 'createdAt'>, Document {}
 
 const DependentSchema = new Schema<Dependent>({
   name: { type: String, required: true },

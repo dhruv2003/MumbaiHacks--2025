@@ -18,6 +18,7 @@ export interface PreciousMetals {
 
 export interface User {
   id: string;
+  _id?: string; // MongoDB ObjectId as string
   aaHandle: string;
   mobile: string;
   pin: string;

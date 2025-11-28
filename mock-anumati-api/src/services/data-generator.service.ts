@@ -1,6 +1,6 @@
 import { config } from '../config/env';
 import { db } from './mongodb.service';
-import { generateUsers } from '../generators/user.generator';
+import { generateUsers, generateMasterUser } from '../generators/user.generator';
 import { generateAccounts } from '../generators/account.generator';
 import { generateMonthlyTransactions } from '../generators/transaction.generator';
 import { generateInvestments } from '../generators/investment.generator';
@@ -24,9 +24,19 @@ export const initializeData = async (): Promise<void> => {
       // Log sample credentials
       const users = await db.getAllUsers();
       if (users.length > 0) {
-        const sampleUser = users[0];
+        // Find master user
+        const masterUser = users.find(u => u.mobile === (process.env.MASTER_MOBILE || '9999999999'));
+        const sampleUser = users.find(u => u.mobile !== (process.env.MASTER_MOBILE || '9999999999')) || users[0];
+        
         logger.info('\n========================================');
-        logger.info('SAMPLE LOGIN CREDENTIALS:');
+        if (masterUser) {
+          logger.info('🔑 MASTER USER (AGENT ACCESS):');
+          logger.info(`AA Handle: ${masterUser.aaHandle}`);
+          logger.info(`Mobile: ${masterUser.mobile}`);
+          logger.info(`PIN: ${process.env.MASTER_PIN || '9999'}`);
+          logger.info('========================================');
+        }
+        logger.info('\nSAMPLE REGULAR USER:');
         logger.info(`AA Handle: ${sampleUser.aaHandle}`);
         logger.info(`Mobile: ${sampleUser.mobile}`);
         logger.info(`PIN: 1234 (default for all users)`);
@@ -35,11 +45,18 @@ export const initializeData = async (): Promise<void> => {
       return;
     }
 
+    // Generate master user for agent access
+    logger.info('Creating master user for agent access...');
+    const masterUser = await generateMasterUser();
+    const masterMongoId = await db.createUser(masterUser);
+    logger.info(`✓ Created master user: ${masterUser.aaHandle}`);
+
     // Generate users
     logger.info(`Generating ${usersCount} users...`);
     const users = await generateUsers(usersCount);
 
     const userIdMap = new Map<string, string>();
+    userIdMap.set(masterUser.id, masterMongoId);
 
     for (const user of users) {
       const mongoId = await db.createUser(user);
@@ -49,7 +66,8 @@ export const initializeData = async (): Promise<void> => {
     logger.info(`✓ Generated ${users.length} users`);
 
     // Generate accounts, transactions, investments, and liabilities for each user
-    for (const user of users) {
+    const allUsers = [masterUser, ...users];
+    for (const user of allUsers) {
       const mongoUserId = userIdMap.get(user.id)!;
       // Generate 2-5 accounts per user
       const accountsCount = randomInt(2, 5);
@@ -101,12 +119,16 @@ export const initializeData = async (): Promise<void> => {
     logger.info('✓ Data generation completed successfully!');
     logger.info(`Stats: ${JSON.stringify(finalStats, null, 2)}`);
 
-    // Log sample credentials
-    const sampleUser = users[0];
+    // Log master and sample credentials
     logger.info('\n========================================');
-    logger.info('SAMPLE LOGIN CREDENTIALS:');
-    logger.info(`AA Handle: ${sampleUser.aaHandle}`);
-    logger.info(`Mobile: ${sampleUser.mobile}`);
+    logger.info('🔑 MASTER USER (AGENT ACCESS):');
+    logger.info(`AA Handle: ${masterUser.aaHandle}`);
+    logger.info(`Mobile: ${masterUser.mobile}`);
+    logger.info(`PIN: ${process.env.MASTER_PIN || '9999'}`);
+    logger.info('========================================');
+    logger.info('\nSAMPLE REGULAR USER:');
+    logger.info(`AA Handle: ${users[0].aaHandle}`);
+    logger.info(`Mobile: ${users[0].mobile}`);
     logger.info(`PIN: 1234 (default for all users)`);
     logger.info('========================================\n');
 

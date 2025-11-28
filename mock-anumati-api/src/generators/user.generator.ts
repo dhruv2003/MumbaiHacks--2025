@@ -132,6 +132,37 @@ export const generateUser = async (): Promise<User> => {
   };
 };
 
+export const generateMasterUser = async (): Promise<User> => {
+  const mobile = process.env.MASTER_MOBILE || '9999999999';
+  const pin = process.env.MASTER_PIN || '9999';
+  const aaHandle = process.env.MASTER_AA_HANDLE || `${mobile}@anumati`;
+
+  // Hash the master PIN
+  const hashedPin = await bcrypt.hash(pin, 10);
+
+  return {
+    id: generateUUID(),
+    aaHandle,
+    mobile,
+    pin: hashedPin,
+    name: 'Agent Master User',
+    email: 'agent@anumati.in',
+    pan: 'AAAAA0000A',
+    dob: '1990-01-01',
+    address: 'Anumati HQ, Mumbai, Maharashtra',
+    city: 'Mumbai',
+    state: 'Maharashtra',
+    pincode: '400001',
+    dependents: [],
+    creditCards: [],
+    preciousMetals: { gold: 0, silver: 0 },
+    financialPersona: 'Professional',
+    userPersona: 'Tech-Savvy',
+    createdAt: new Date(),
+    linkedAccounts: []
+  };
+};
+
 export const generateUsers = async (count: number): Promise<User[]> => {
   const users: User[] = [];
   for (let i = 0; i < count; i++) {

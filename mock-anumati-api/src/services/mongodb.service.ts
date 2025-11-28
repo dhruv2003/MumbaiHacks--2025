@@ -16,24 +16,24 @@ class MongoDBService {
   async getUserById(id: string): Promise<User | undefined> {
     const user = await UserModel.findById(id).lean();
     if (!user) return undefined;
-    return { ...user, id: user._id.toString(), createdAt: (user as any).createdAt || new Date() } as any as User;
+    return { ...user, id: user._id.toString(), _id: user._id.toString(), createdAt: (user as any).createdAt || new Date() } as any as User;
   }
 
   async getUserByMobile(mobile: string): Promise<User | undefined> {
     const user = await UserModel.findOne({ mobile }).lean();
     if (!user) return undefined;
-    return { ...user, id: user._id.toString(), createdAt: (user as any).createdAt || new Date() } as any as User;
+    return { ...user, id: user._id.toString(), _id: user._id.toString(), createdAt: (user as any).createdAt || new Date() } as any as User;
   }
 
   async getUserByAAHandle(aaHandle: string): Promise<User | undefined> {
     const user = await UserModel.findOne({ aaHandle }).lean();
     if (!user) return undefined;
-    return { ...user, id: user._id.toString(), createdAt: (user as any).createdAt || new Date() } as any as User;
+    return { ...user, id: user._id.toString(), _id: user._id.toString(), createdAt: (user as any).createdAt || new Date() } as any as User;
   }
 
   async getAllUsers(): Promise<User[]> {
     const users = await UserModel.find().lean();
-    return users.map(u => ({ ...u, id: u._id.toString(), createdAt: (u as any).createdAt || new Date() } as any as User));
+    return users.map(u => ({ ...u, id: u._id.toString(), _id: u._id.toString(), createdAt: (u as any).createdAt || new Date() } as any as User));
   }
 
   async updateUser(id: string, updates: Partial<User>): Promise<void> {

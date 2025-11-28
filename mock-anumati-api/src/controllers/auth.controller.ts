@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AuthService } from '../services/auth.service';
 import { db } from '../services/mongodb.service';
+import { isMasterUser } from '../middleware/auth.middleware';
 
 export class AuthController {
   static async login(req: Request, res: Response): Promise<void> {
@@ -23,6 +24,7 @@ export class AuthController {
           token,
           user: {
             id: user.id,
+            _id: (user as any)._id || user.id, // MongoDB ID for querying as master user
             aaHandle: user.aaHandle,
             name: user.name,
             mobile: user.mobile,
@@ -77,7 +79,20 @@ export class AuthController {
 
   static async getProfile(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      // Check if master user is querying another user
+      const queryUserId = req.query.user_id as string;
+      const isMaster = isMasterUser(req.user?.aaHandle || '');
+      
+      // Regular users cannot query other users
+      if (queryUserId && !isMaster) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied: Only master user can query other users'
+        });
+        return;
+      }
+
+      const userId = queryUserId && isMaster ? queryUserId : req.user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -101,6 +116,7 @@ export class AuthController {
         success: true,
         data: {
           id: user.id,
+          _id: (user as any)._id || user.id, // MongoDB ID for querying as master user
           aaHandle: user.aaHandle,
           name: user.name,
           mobile: user.mobile,
@@ -136,6 +152,8 @@ export class AuthController {
         data: {
           count: users.length,
           users: users.map(user => ({
+            id: user.id,
+            _id: (user as any)._id || user.id, // MongoDB ID for querying as master user
             aaHandle: user.aaHandle,
             name: user.name,
             mobile: user.mobile,

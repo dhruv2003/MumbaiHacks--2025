@@ -1,11 +1,25 @@
 import { Request, Response } from 'express';
 import { AggregationService } from '../services/aggregation.service';
 import { db } from '../services/mongodb.service';
+import { isMasterUser } from '../middleware/auth.middleware';
 
 export class AggregatedController {
   static async getNetWorth(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      // Check if master user is querying another user
+      const queryUserId = req.query.user_id as string;
+      const isMaster = isMasterUser(req.user?.aaHandle || '');
+      
+      // Regular users cannot query other users
+      if (queryUserId && !isMaster) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied: Only master user can query other users'
+        });
+        return;
+      }
+
+      const userId = queryUserId && isMaster ? queryUserId : req.user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -31,7 +45,20 @@ export class AggregatedController {
 
   static async getAccountsSummary(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      // Check if master user is querying another user
+      const queryUserId = req.query.user_id as string;
+      const isMaster = isMasterUser(req.user?.aaHandle || '');
+      
+      // Regular users cannot query other users
+      if (queryUserId && !isMaster) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied: Only master user can query other users'
+        });
+        return;
+      }
+
+      const userId = queryUserId && isMaster ? queryUserId : req.user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -72,7 +99,20 @@ export class AggregatedController {
 
   static async getTransactions(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      // Check if master user is querying another user
+      const queryUserId = req.query.user_id as string;
+      const isMaster = isMasterUser(req.user?.aaHandle || '');
+      
+      // Regular users cannot query other users
+      if (queryUserId && !isMaster) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied: Only master user can query other users'
+        });
+        return;
+      }
+
+      const userId = queryUserId && isMaster ? queryUserId : req.user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -96,25 +136,19 @@ export class AggregatedController {
       const offsetNum = parseInt(offset as string, 10);
       const paginatedTransactions = summary.transactions.slice(offsetNum, offsetNum + limitNum);
 
-      const transactionsWithAccounts = await Promise.all(
-        paginatedTransactions.map(async (txn) => {
-          const account = await db.getAccountById(txn.accountId);
-          return {
-            id: txn.id,
-            date: txn.transactionTimestamp,
-            type: txn.type,
-            amount: txn.amount,
-            category: txn.category,
-            mode: txn.mode,
-            merchantName: txn.merchantName,
-            narration: txn.narration,
-            account: {
-              bank: account?.fipName,
-              maskedNumber: account?.maskedAccNumber
-            }
-          };
-        })
-      );
+      // Return transactions directly without account lookup to avoid ObjectId casting issues
+      const transactionsFormatted = paginatedTransactions.map((txn) => ({
+        id: txn.id,
+        accountId: txn.accountId,
+        date: txn.transactionTimestamp,
+        type: txn.type,
+        amount: txn.amount,
+        category: txn.category,
+        mode: txn.mode,
+        merchantName: txn.merchantName,
+        narration: txn.narration,
+        currentBalance: txn.currentBalance
+      }));
 
       res.json({
         success: true,
@@ -126,7 +160,7 @@ export class AggregatedController {
           totalDebits: summary.totalDebits,
           netFlow: summary.netFlow,
           categoryBreakdown: summary.categoryBreakdown,
-          transactions: transactionsWithAccounts
+          transactions: transactionsFormatted
         }
       });
     } catch (error: any) {
@@ -139,7 +173,20 @@ export class AggregatedController {
 
   static async getLiabilities(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      // Check if master user is querying another user
+      const queryUserId = req.query.user_id as string;
+      const isMaster = isMasterUser(req.user?.aaHandle || '');
+      
+      // Regular users cannot query other users
+      if (queryUserId && !isMaster) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied: Only master user can query other users'
+        });
+        return;
+      }
+
+      const userId = queryUserId && isMaster ? queryUserId : req.user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -187,7 +234,20 @@ export class AggregatedController {
 
   static async getInvestments(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      // Check if master user is querying another user
+      const queryUserId = req.query.user_id as string;
+      const isMaster = isMasterUser(req.user?.aaHandle || '');
+      
+      // Regular users cannot query other users
+      if (queryUserId && !isMaster) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied: Only master user can query other users'
+        });
+        return;
+      }
+
+      const userId = queryUserId && isMaster ? queryUserId : req.user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -235,7 +295,20 @@ export class AggregatedController {
 
   static async getMonthlySpending(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      // Check if master user is querying another user
+      const queryUserId = req.query.user_id as string;
+      const isMaster = isMasterUser(req.user?.aaHandle || '');
+      
+      // Regular users cannot query other users
+      if (queryUserId && !isMaster) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied: Only master user can query other users'
+        });
+        return;
+      }
+
+      const userId = queryUserId && isMaster ? queryUserId : req.user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -262,7 +335,20 @@ export class AggregatedController {
 
   static async getIncomeSources(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      // Check if master user is querying another user
+      const queryUserId = req.query.user_id as string;
+      const isMaster = isMasterUser(req.user?.aaHandle || '');
+      
+      // Regular users cannot query other users
+      if (queryUserId && !isMaster) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied: Only master user can query other users'
+        });
+        return;
+      }
+
+      const userId = queryUserId && isMaster ? queryUserId : req.user?.userId;
 
       if (!userId) {
         res.status(401).json({

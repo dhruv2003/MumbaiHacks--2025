@@ -1,10 +1,24 @@
 import { Request, Response } from 'express';
 import { db } from '../services/mongodb.service';
+import { isMasterUser } from '../middleware/auth.middleware';
 
 export class AccountController {
   static async discoverAccounts(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      // Check if master user is querying another user
+      const queryUserId = req.query.user_id as string;
+      const isMaster = isMasterUser(req.user?.aaHandle || '');
+      
+      // Regular users cannot query other users
+      if (queryUserId && !isMaster) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied: Only master user can query other users'
+        });
+        return;
+      }
+
+      const userId = queryUserId && isMaster ? queryUserId : req.user?.userId;
 
       if (!userId) {
         res.status(401).json({
@@ -39,7 +53,20 @@ export class AccountController {
 
   static async getAllAccounts(req: Request, res: Response): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      // Check if master user is querying another user
+      const queryUserId = req.query.user_id as string;
+      const isMaster = isMasterUser(req.user?.aaHandle || '');
+      
+      // Regular users cannot query other users
+      if (queryUserId && !isMaster) {
+        res.status(403).json({
+          success: false,
+          error: 'Access denied: Only master user can query other users'
+        });
+        return;
+      }
+
+      const userId = queryUserId && isMaster ? queryUserId : req.user?.userId;
 
       if (!userId) {
         res.status(401).json({

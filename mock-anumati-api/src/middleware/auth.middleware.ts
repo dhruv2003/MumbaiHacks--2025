@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthService } from '../services/auth.service';
 import { JWTPayload } from '../types';
+import { logger } from '../utils/logger';
 
 // Extend Express Request to include user
 declare global {
@@ -10,6 +11,12 @@ declare global {
     }
   }
 }
+
+// Check if user is master user
+export const isMasterUser = (aaHandle: string): boolean => {
+  const masterHandle = process.env.MASTER_AA_HANDLE || '9999999999@anumati';
+  return aaHandle === masterHandle;
+};
 
 export const authenticateToken = (req: Request, res: Response, next: NextFunction): void => {
   try {
@@ -26,6 +33,12 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
 
     const payload = AuthService.verifyToken(token);
     req.user = payload;
+
+    // Log master user access
+    if (isMasterUser(payload.aaHandle)) {
+      const queryUserId = req.query.user_id || req.body.user_id;
+      logger.info(`🔑 Master user access: ${payload.aaHandle} ${queryUserId ? `querying user_id: ${queryUserId}` : '(own data)'}`);
+    }
 
     next();
   } catch (error) {
