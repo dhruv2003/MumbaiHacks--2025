@@ -1,0 +1,495 @@
+{
+  "info": {
+    "name": "Mock Anumati API v2",
+    "description": "Complete collection for testing Mock Anumati Account Aggregator API with MongoDB integration, user profile management, and precious metals tracking",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "2.0.0"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register New User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"email\": \"rahul.sharma@example.com\",\n  \"phone\": \"9876543210\",\n  \"pan\": \"ABCDE1234F\",\n  \"pin\": \"1234\",\n  \"dob\": \"1990-05-15\",\n  \"address\": \"123, Sector 5, Mumbai\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"pincode\": \"400001\",\n  \"dependents\": [\n    {\n      \"name\": \"Priya Sharma\",\n      \"age\": 32,\n      \"sex\": \"FEMALE\",\n      \"relationship\": \"Spouse\"\n    }\n  ],\n  \"creditCards\": [\n    {\n      \"bankName\": \"HDFC Bank\",\n      \"cardType\": \"VISA\",\n      \"cardVariant\": \"Regalia\"\n    }\n  ],\n  \"goldGrams\": 50,\n  \"silverGrams\": 500\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            },
+            "description": "Register a new user with financial data. Creates user with all profile info and automatically generates accounts, transactions (6 months), investments, and liabilities. Returns JWT token for immediate login. Required fields: name, email, phone, pan. PIN defaults to '1234' if not provided."
+          }
+        },
+        {
+          "name": "List All Users (for testing)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/users",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "users"
+              ]
+            },
+            "description": "Get a list of all users in the system with their AA handles for easy testing. This endpoint is public for testing purposes only."
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"aaHandle\": \"9876543210@anumati\",\n  \"pin\": \"1234\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            },
+            "description": "Login with AA Handle and PIN. Default PIN for all test users is '1234'. Token is automatically saved to collection variables."
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "logout"
+              ]
+            },
+            "description": "Logout the current user. Since JWT is stateless, remember to delete the token from client side."
+          }
+        },
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/profile",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"mobile\": \"9876543210\",\n  \"otp\": \"1234\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/verify-otp",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "verify-otp"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit User Form",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"email\": \"rahul.sharma@example.com\",\n  \"phone\": \"9876543210\",\n  \"pan\": \"ABCDE1234F\",\n  \"address\": \"123, Sector 5, Street, Mumbai, Maharashtra\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"pincode\": \"400001\",\n  \"dependents\": [\n    {\n      \"name\": \"Priya Sharma\",\n      \"age\": 32,\n      \"sex\": \"FEMALE\",\n      \"relationship\": \"Spouse\"\n    },\n    {\n      \"name\": \"Aryan Sharma\",\n      \"age\": 8,\n      \"sex\": \"MALE\",\n      \"relationship\": \"Son\"\n    }\n  ],\n  \"creditCards\": [\n    {\n      \"bankName\": \"HDFC Bank\",\n      \"cardType\": \"VISA\",\n      \"cardVariant\": \"Regalia\"\n    },\n    {\n      \"bankName\": \"ICICI Bank\",\n      \"cardType\": \"MASTERCARD\",\n      \"cardVariant\": \"Coral\"\n    }\n  ],\n  \"goldGrams\": 50,\n  \"silverGrams\": 500\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/form",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "form"
+              ]
+            },
+            "description": "Submit or update user profile information including personal details, location, dependents, credit cards, and precious metals (gold/silver) holdings. All fields are optional - only provided fields will be updated.\n\nIMPORTANT: If the user has no financial data (no accounts), this endpoint will automatically generate realistic financial data including accounts, transactions (6 months history), investments, and liabilities. The response includes a 'financialDataGenerated' field to indicate if data was auto-generated."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Accounts",
+      "item": [
+        {
+          "name": "Discover Accounts",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/discover",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts",
+                "discover"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get All Accounts",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/accounts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Account by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/accounts/:accountId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "accounts",
+                ":accountId"
+              ],
+              "variable": [
+                {
+                  "key": "accountId",
+                  "value": "your-account-id"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Aggregated Data",
+      "item": [
+        {
+          "name": "Get Net Worth",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/aggregated/net-worth",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "aggregated",
+                "net-worth"
+              ]
+            },
+            "description": "Get complete net worth breakdown including bank accounts, investments, liabilities, and precious metals (gold/silver) valuation. Returns detailed breakdown with current rates and values."
+          }
+        },
+        {
+          "name": "Get Accounts Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/aggregated/accounts-summary",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "aggregated",
+                "accounts-summary"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/aggregated/transactions?limit=50&offset=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "aggregated",
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "from",
+                  "value": "2025-01-01",
+                  "disabled": true
+                },
+                {
+                  "key": "to",
+                  "value": "2025-12-31",
+                  "disabled": true
+                },
+                {
+                  "key": "category",
+                  "value": "Food",
+                  "disabled": true
+                },
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "offset",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Investments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/aggregated/investments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "aggregated",
+                "investments"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Liabilities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/aggregated/liabilities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "aggregated",
+                "liabilities"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Monthly Spending",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/aggregated/monthly-spending?months=6",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "aggregated",
+                "monthly-spending"
+              ],
+              "query": [
+                {
+                  "key": "months",
+                  "value": "6"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Income Sources",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/aggregated/income-sources",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "aggregated",
+                "income-sources"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "health"
+          ]
+        }
+      }
+    }
+  ]
+}
