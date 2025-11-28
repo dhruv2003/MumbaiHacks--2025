@@ -11,6 +11,11 @@ import { errorHandler, notFound } from './middleware/error.middleware';
 
 const app: Application = express();
 
+// Trust proxy setting for production (behind reverse proxy)
+if (config.server.trustProxy) {
+  app.set('trust proxy', true);
+}
+
 // Middleware
 app.use(helmet()); // Security headers
 app.use(cors({ origin: config.cors.origin })); // CORS
