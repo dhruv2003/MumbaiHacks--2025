@@ -1,18 +1,25 @@
 {
   "info": {
-    "name": "Mock Anumati API v2",
-    "description": "Complete collection for testing Mock Anumati Account Aggregator API with MongoDB integration, user profile management, and precious metals tracking",
+    "name": "Mock Anumati API v2.1 - NO AUTH MODE",
+    "description": "Mock Anumati Account Aggregator API with NO AUTHENTICATION REQUIRED! Just add ?user_id= to any endpoint. Perfect for AI agents and quick testing. Production: https://anumati.thisisdhruv.in/api/v1",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "version": "2.0.0"
+    "version": "2.1.0"
   },
   "variable": [
     {
       "key": "baseUrl",
-      "value": "http://localhost:3000/api/v1"
+      "value": "https://anumati.thisisdhruv.in/api/v1",
+      "type": "string"
     },
     {
-      "key": "token",
-      "value": ""
+      "key": "localUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "692a430fbecb32675be14c9a",
+      "type": "string"
     }
   ],
   "item": [
@@ -20,34 +27,21 @@
       "name": "Authentication",
       "item": [
         {
-          "name": "Register New User",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+          "name": "List All Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.success && jsonData.data.users.length > 0) {",
+                  "    pm.collectionVariables.set('userId', jsonData.data.users[0]._id);",
+                  "    console.log('User ID saved:', jsonData.data.users[0]._id);",
+                  "}"
+                ]
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"email\": \"rahul.sharma@example.com\",\n  \"phone\": \"9876543210\",\n  \"pan\": \"ABCDE1234F\",\n  \"pin\": \"1234\",\n  \"dob\": \"1990-05-15\",\n  \"address\": \"123, Sector 5, Mumbai\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"pincode\": \"400001\",\n  \"dependents\": [\n    {\n      \"name\": \"Priya Sharma\",\n      \"age\": 32,\n      \"sex\": \"FEMALE\",\n      \"relationship\": \"Spouse\"\n    }\n  ],\n  \"creditCards\": [\n    {\n      \"bankName\": \"HDFC Bank\",\n      \"cardType\": \"VISA\",\n      \"cardVariant\": \"Regalia\"\n    }\n  ],\n  \"goldGrams\": 50,\n  \"silverGrams\": 500\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/register",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "register"
-              ]
-            },
-            "description": "Register a new user with financial data. Creates user with all profile info and automatically generates accounts, transactions (6 months), investments, and liabilities. Returns JWT token for immediate login. Required fields: name, email, phone, pan. PIN defaults to '1234' if not provided."
-          }
-        },
-        {
-          "name": "List All Users (for testing)",
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -61,7 +55,7 @@
                 "users"
               ]
             },
-            "description": "Get a list of all users in the system with their AA handles for easy testing. This endpoint is public for testing purposes only."
+            "description": "Get list of all 11 pre-loaded users with their MongoDB _id values. NO AUTHENTICATION REQUIRED! Pick any _id and use it as ?user_id= in other endpoints. The first user's ID is automatically saved to {{userId}} variable."
           }
         },
         {
@@ -101,56 +95,11 @@
                 "login"
               ]
             },
-            "description": "Login with AA Handle and PIN. Default PIN for all test users is '1234'. Token is automatically saved to collection variables."
+            "description": "Login with AA Handle and PIN. Default PIN for all test users is '1234'. Token is automatically saved to collection variables. NOTE: Login is still available but NOT REQUIRED in no-auth mode."
           }
         },
         {
-          "name": "Logout",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/auth/logout",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "logout"
-              ]
-            },
-            "description": "Logout the current user. Since JWT is stateless, remember to delete the token from client side."
-          }
-        },
-        {
-          "name": "Get Profile",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/auth/profile",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "profile"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Verify OTP",
+          "name": "Register New User",
           "request": {
             "method": "POST",
             "header": [
@@ -161,18 +110,44 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"mobile\": \"9876543210\",\n  \"otp\": \"1234\"\n}"
+              "raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"email\": \"rahul.sharma@example.com\",\n  \"phone\": \"9876543210\",\n  \"pan\": \"ABCDE1234F\",\n  \"pin\": \"1234\",\n  \"dob\": \"1990-05-15\",\n  \"address\": \"123, Sector 5, Mumbai\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"pincode\": \"400001\",\n  \"dependents\": [\n    {\n      \"name\": \"Priya Sharma\",\n      \"age\": 32,\n      \"sex\": \"FEMALE\",\n      \"relationship\": \"Spouse\"\n    }\n  ],\n  \"creditCards\": [\n    {\n      \"bankName\": \"HDFC Bank\",\n      \"cardType\": \"VISA\",\n      \"cardVariant\": \"Regalia\"\n    }\n  ],\n  \"goldGrams\": 50,\n  \"silverGrams\": 500\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/auth/verify-otp",
+              "raw": "{{baseUrl}}/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "auth",
-                "verify-otp"
+                "register"
               ]
-            }
+            },
+            "description": "Register a new user with financial data. Creates user with all profile info and automatically generates accounts, transactions (6 months), investments, and liabilities. Returns JWT token. Required fields: name, email, phone, pan. PIN defaults to '1234' if not provided."
+          }
+        },
+        {
+          "name": "Get User Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/profile?user_id={{userId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "{{userId}}",
+                  "description": "MongoDB _id from /auth/users (optional - omit for master user)"
+                }
+              ]
+            },
+            "description": "Get detailed profile for a specific user. NO AUTHENTICATION REQUIRED! Just provide user_id query parameter."
           }
         },
         {
@@ -181,91 +156,70 @@
             "method": "POST",
             "header": [
               {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              },
-              {
                 "key": "Content-Type",
                 "value": "application/json"
               }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"email\": \"rahul.sharma@example.com\",\n  \"phone\": \"9876543210\",\n  \"pan\": \"ABCDE1234F\",\n  \"address\": \"123, Sector 5, Street, Mumbai, Maharashtra\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"pincode\": \"400001\",\n  \"dependents\": [\n    {\n      \"name\": \"Priya Sharma\",\n      \"age\": 32,\n      \"sex\": \"FEMALE\",\n      \"relationship\": \"Spouse\"\n    },\n    {\n      \"name\": \"Aryan Sharma\",\n      \"age\": 8,\n      \"sex\": \"MALE\",\n      \"relationship\": \"Son\"\n    }\n  ],\n  \"creditCards\": [\n    {\n      \"bankName\": \"HDFC Bank\",\n      \"cardType\": \"VISA\",\n      \"cardVariant\": \"Regalia\"\n    },\n    {\n      \"bankName\": \"ICICI Bank\",\n      \"cardType\": \"MASTERCARD\",\n      \"cardVariant\": \"Coral\"\n    }\n  ],\n  \"goldGrams\": 50,\n  \"silverGrams\": 500\n}"
+              "raw": "{\n  \"name\": \"Rahul Sharma\",\n  \"email\": \"rahul.sharma@example.com\",\n  \"phone\": \"9876543210\",\n  \"pan\": \"ABCDE1234F\",\n  \"address\": \"123, Sector 5, Street, Mumbai, Maharashtra\",\n  \"city\": \"Mumbai\",\n  \"state\": \"Maharashtra\",\n  \"pincode\": \"400001\",\n  \"dependents\": [\n    {\n      \"name\": \"Priya Sharma\",\n      \"age\": 32,\n      \"sex\": \"FEMALE\",\n      \"relationship\": \"Spouse\"\n    }\n  ],\n  \"creditCards\": [\n    {\n      \"bankName\": \"HDFC Bank\",\n      \"cardType\": \"VISA\",\n      \"cardVariant\": \"Regalia\"\n    }\n  ],\n  \"goldGrams\": 50,\n  \"silverGrams\": 500\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/auth/form",
+              "raw": "{{baseUrl}}/auth/form?user_id={{userId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "auth",
                 "form"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "{{userId}}",
+                  "description": "MongoDB _id from /auth/users (optional)"
+                }
               ]
             },
-            "description": "Submit or update user profile information including personal details, location, dependents, credit cards, and precious metals (gold/silver) holdings. All fields are optional - only provided fields will be updated.\n\nIMPORTANT: If the user has no financial data (no accounts), this endpoint will automatically generate realistic financial data including accounts, transactions (6 months history), investments, and liabilities. The response includes a 'financialDataGenerated' field to indicate if data was auto-generated."
+            "description": "Submit or update user profile information including personal details, location, dependents, credit cards, and precious metals (gold/silver) holdings. All fields are optional - only provided fields will be updated. If the user has no financial data, this endpoint will automatically generate it."
           }
         }
       ]
     },
     {
-      "name": "Accounts",
+      "name": "Accounts - NO AUTH REQUIRED",
       "item": [
-        {
-          "name": "Discover Accounts",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/accounts/discover",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "accounts",
-                "discover"
-              ]
-            }
-          }
-        },
         {
           "name": "Get All Accounts",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/accounts",
+              "raw": "{{baseUrl}}/accounts?user_id={{userId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "accounts"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "{{userId}}",
+                  "description": "MongoDB _id from /auth/users"
+                }
               ]
-            }
+            },
+            "description": "Get all accounts for a user. NO AUTHENTICATION REQUIRED! Just provide user_id query parameter."
           }
         },
         {
           "name": "Get Account by ID",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/accounts/:accountId",
+              "raw": "{{baseUrl}}/accounts/:accountId?user_id={{userId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -273,77 +227,61 @@
                 "accounts",
                 ":accountId"
               ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "{{userId}}",
+                  "description": "MongoDB _id from /auth/users"
+                }
+              ],
               "variable": [
                 {
                   "key": "accountId",
-                  "value": "your-account-id"
+                  "value": "your-account-id",
+                  "description": "Account ID from /accounts response"
                 }
               ]
-            }
+            },
+            "description": "Get detailed account information by ID. NO AUTHENTICATION REQUIRED!"
           }
         }
       ]
     },
     {
-      "name": "Aggregated Data",
+      "name": "Aggregated Data - NO AUTH REQUIRED",
       "item": [
         {
           "name": "Get Net Worth",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/aggregated/net-worth",
+              "raw": "{{baseUrl}}/aggregated/net-worth?user_id={{userId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "aggregated",
                 "net-worth"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "{{userId}}",
+                  "description": "MongoDB _id from /auth/users"
+                }
               ]
             },
-            "description": "Get complete net worth breakdown including bank accounts, investments, liabilities, and precious metals (gold/silver) valuation. Returns detailed breakdown with current rates and values."
-          }
-        },
-        {
-          "name": "Get Accounts Summary",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/aggregated/accounts-summary",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "aggregated",
-                "accounts-summary"
-              ]
-            }
+            "description": "Get complete net worth breakdown including bank accounts, investments, liabilities, and precious metals (gold/silver) valuation. NO AUTHENTICATION REQUIRED!"
           }
         },
         {
           "name": "Get Transactions",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/aggregated/transactions?limit=50&offset=0",
+              "raw": "{{baseUrl}}/aggregated/transactions?user_id={{userId}}&from=2025-05-01&to=2025-11-30&limit=10",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -353,88 +291,99 @@
               ],
               "query": [
                 {
+                  "key": "user_id",
+                  "value": "{{userId}}",
+                  "description": "MongoDB _id from /auth/users"
+                },
+                {
                   "key": "from",
-                  "value": "2025-01-01",
-                  "disabled": true
+                  "value": "2025-05-01",
+                  "description": "Start date (use 2025 dates - data is May-Nov 2025)"
                 },
                 {
                   "key": "to",
-                  "value": "2025-12-31",
-                  "disabled": true
+                  "value": "2025-11-30",
+                  "description": "End date (use 2025 dates)"
                 },
                 {
                   "key": "category",
                   "value": "Food",
-                  "disabled": true
+                  "disabled": true,
+                  "description": "Optional category filter"
                 },
                 {
                   "key": "limit",
-                  "value": "50"
+                  "value": "10",
+                  "description": "Number of results (default: 100)"
                 },
                 {
                   "key": "offset",
-                  "value": "0"
+                  "value": "0",
+                  "disabled": true,
+                  "description": "Pagination offset"
                 }
               ]
-            }
+            },
+            "description": "Get transaction history. NO AUTHENTICATION REQUIRED! IMPORTANT: Use 2025 dates (May-Nov 2025) as that's when data is generated."
           }
         },
         {
           "name": "Get Investments",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/aggregated/investments",
+              "raw": "{{baseUrl}}/aggregated/investments?user_id={{userId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "aggregated",
                 "investments"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "{{userId}}",
+                  "description": "MongoDB _id from /auth/users"
+                }
               ]
-            }
+            },
+            "description": "Get all investments (mutual funds, stocks, PPF, EPF, NPS, FDs). NO AUTHENTICATION REQUIRED!"
           }
         },
         {
           "name": "Get Liabilities",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/aggregated/liabilities",
+              "raw": "{{baseUrl}}/aggregated/liabilities?user_id={{userId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "aggregated",
                 "liabilities"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "{{userId}}",
+                  "description": "MongoDB _id from /auth/users"
+                }
               ]
-            }
+            },
+            "description": "Get all liabilities (credit cards, loans). NO AUTHENTICATION REQUIRED! Note: Some users may have no liabilities."
           }
         },
         {
           "name": "Get Monthly Spending",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/aggregated/monthly-spending?months=6",
+              "raw": "{{baseUrl}}/aggregated/monthly-spending?user_id={{userId}}&months=6",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -444,33 +393,43 @@
               ],
               "query": [
                 {
+                  "key": "user_id",
+                  "value": "{{userId}}",
+                  "description": "MongoDB _id from /auth/users"
+                },
+                {
                   "key": "months",
-                  "value": "6"
+                  "value": "6",
+                  "description": "Number of months (default: 6)"
                 }
               ]
-            }
+            },
+            "description": "Get month-wise spending breakdown. NO AUTHENTICATION REQUIRED!"
           }
         },
         {
           "name": "Get Income Sources",
           "request": {
             "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{token}}"
-              }
-            ],
+            "header": [],
             "url": {
-              "raw": "{{baseUrl}}/aggregated/income-sources",
+              "raw": "{{baseUrl}}/aggregated/income-sources?user_id={{userId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "aggregated",
                 "income-sources"
+              ],
+              "query": [
+                {
+                  "key": "user_id",
+                  "value": "{{userId}}",
+                  "description": "MongoDB _id from /auth/users"
+                }
               ]
-            }
+            },
+            "description": "Get income breakdown by category. NO AUTHENTICATION REQUIRED!"
           }
         }
       ]

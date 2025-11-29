@@ -2,14 +2,24 @@
 
 A comprehensive mock implementation of the Anumati Account Aggregator (AA) API with realistic Indian financial data. This service simulates the RBI-licensed Account Aggregator framework, providing secure, consent-based financial information aggregation across banks, investments, and liabilities.
 
+## 🔓 NO AUTHENTICATION MODE
+
+**Perfect for AI Agents & Quick Testing!** This API runs in **no-auth mode** for easy integration:
+
+- ❌ **No login required** - Skip authentication entirely
+- ❌ **No JWT tokens needed** - No Authorization headers
+- ✅ **Direct API access** - Just add `?user_id=` to any endpoint
+- ✅ **11 pre-loaded users** - Get user IDs from `/auth/users`
+
 ## Features
 
+- **No Authentication Required**: All endpoints accessible without tokens for easy AI agent integration
 - **Realistic Indian Financial Data**: Authentic bank names, IFSC codes, UPI transactions, merchant names, and transaction patterns
 - **Complete Account Aggregation**: Savings accounts, current accounts, credit cards, fixed deposits, and recurring deposits
 - **Investment Portfolio**: Mutual funds, equities, PPF, EPF, NPS, and fixed deposits
 - **Liability Management**: Credit cards, personal loans, home loans, car loans, and education loans
 - **Transaction History**: 300+ realistic transactions per account with Indian payment modes (UPI, NEFT, RTGS, IMPS, ATM, Card)
-- **JWT Authentication**: Secure token-based authentication
+- **11 Pre-loaded Users**: Ready-to-use test data with unique MongoDB IDs
 - **MongoDB Persistence**: All data stored in MongoDB Atlas for reliable persistence
 - **User Profile Management**: Extended user profiles with location, dependents, credit cards, and precious metals
 - **Precious Metals Tracking**: Track gold and silver holdings with configurable rates for net worth calculation
@@ -125,26 +135,99 @@ These rates are used to calculate the value of user's precious metal holdings in
 ### Base URL
 
 ```
-http://localhost:3000/api/v1
+Production: https://anumati.thisisdhruv.in/api/v1
+Local: http://localhost:3000/api/v1
 ```
 
-### Authentication
+### Authentication - NO AUTH MODE! 🚀
 
-All protected endpoints require a JWT token in the Authorization header:
+**This API runs in no-auth mode.** No authentication headers required!
 
+#### How to Use:
+
+**Step 1:** Get list of available users
+```bash
+GET /auth/users
 ```
-Authorization: Bearer <your_jwt_token>
+
+**Step 2:** Pick a user_id from the response (MongoDB `_id` field)
+
+**Step 3:** Query any endpoint with the user_id parameter:
+```bash
+GET /aggregated/transactions?user_id=692a430fbecb32675be14c9a
+GET /aggregated/net-worth?user_id=692a430fbecb32675be14c9a
 ```
+
+**That's it!** No tokens, no login, no authentication headers needed.
 
 ### Endpoints
 
 #### 1. Authentication
 
+##### List All Users
+
+**GET** `/auth/users` (Public - No Auth Required)
+
+Returns all 11 pre-loaded users with their MongoDB IDs for querying.
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "count": 11,
+    "users": [
+      {
+        "_id": "692a430ebecb32675be14c98",
+        "name": "Rajesh Kumar Sharma",
+        "email": "rajesh.kumar@example.com",
+        "mobile": "9876543210",
+        "aaHandle": "9876543210@anumati",
+        "pan": "ABCDE1234F",
+        "accountsCount": 4
+      }
+    ]
+  }
+}
+```
+
+##### Login
+
+**POST** `/auth/login`
+
+Login endpoint (still available but not required in no-auth mode).
+
+Request:
+```json
+{
+  "aaHandle": "9876543210@anumati",
+  "pin": "1234"
+}
+```
+
+Response:
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": "uuid",
+      "aaHandle": "9876543210@anumati",
+      "name": "Rajesh Sharma",
+      "mobile": "9876543210",
+      "email": "rajesh.sharma@gmail.com",
+      "pan": "ABCDE1234F"
+    }
+  }
+}
+```
+
 ##### Register
 
-**POST** `/auth/register` (Public)
+**POST** `/auth/register`
 
-Create a new user with financial data. Automatically generates accounts, transactions, investments, and liabilities. Returns a JWT token for immediate login.
+Create a new user with financial data. Automatically generates accounts, transactions, investments, and liabilities.
 
 Request:
 ```json
@@ -198,97 +281,36 @@ Response:
 }
 ```
 
-**Note:**
-- Required fields: `name`, `email`, `phone`, `pan`
-- Optional `pin` (defaults to "1234")
-- Optional `dob` (defaults to 1990-01-01)
-- AA Handle is auto-generated as `{phone}@anumati`
-- Automatically creates 2-5 accounts, 3-8 investments, 0-3 liabilities
+##### Get User Profile
 
-##### Login
+**GET** `/auth/profile?user_id={userId}` (No Auth Required)
 
-**POST** `/auth/login`
+Get detailed profile information for a specific user.
 
-Request:
-```json
-{
-  "aaHandle": "9876543210@anumati",
-  "pin": "1234"
-}
-```
+Query Parameters:
+- `user_id` (optional): MongoDB _id from `/auth/users`. If not provided, returns master user profile.
 
 Response:
 ```json
 {
   "success": true,
   "data": {
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-    "user": {
-      "id": "uuid",
-      "aaHandle": "9876543210@anumati",
-      "name": "Rajesh Sharma",
-      "mobile": "9876543210",
-      "email": "rajesh.sharma@gmail.com",
-      "pan": "ABCDE1234F"
-    }
-  }
-}
-```
-
-##### Logout
-
-**POST** `/auth/logout` (Protected)
-
-Response:
-```json
-{
-  "success": true,
-  "data": {
-    "message": "Logged out successfully"
-  }
-}
-```
-
-Note: Since JWT is stateless, logout is handled by removing the token on the client side. This endpoint confirms the logout action.
-
-##### Get Profile
-
-**GET** `/auth/profile` (Protected)
-
-Response:
-```json
-{
-  "success": true,
-  "data": {
-    "id": "mongodb_id",
-    "aaHandle": "9876543210@anumati",
-    "name": "Rajesh Sharma",
-    "mobile": "9876543210",
-    "email": "rajesh.sharma@gmail.com",
-    "pan": "ABCDE1234F",
-    "dob": "1985-07-15",
-    "address": "123, MG Road",
-    "city": "Mumbai",
+    "_id": "692a430fbecb32675be14c9a",
+    "aaHandle": "9876543211@anumati",
+    "name": "Pooja Kulkarni",
+    "mobile": "9876543211",
+    "email": "pooja.kulkarni@example.com",
+    "pan": "BCDEF2345G",
+    "dob": "1992-03-20",
+    "address": "456, FC Road, Pune",
+    "city": "Pune",
     "state": "Maharashtra",
-    "pincode": "400001",
-    "dependents": [
-      {
-        "name": "Priya Sharma",
-        "age": 32,
-        "sex": "FEMALE",
-        "relationship": "Spouse"
-      }
-    ],
-    "creditCards": [
-      {
-        "bankName": "HDFC Bank",
-        "cardType": "VISA",
-        "cardVariant": "Regalia"
-      }
-    ],
+    "pincode": "411004",
+    "dependents": [...],
+    "creditCards": [...],
     "preciousMetals": {
-      "gold": 50,
-      "silver": 500
+      "gold": 75,
+      "silver": 800
     },
     "linkedAccounts": 3
   }
@@ -297,11 +319,9 @@ Response:
 
 ##### Submit User Form
 
-**POST** `/auth/form` (Protected)
+**POST** `/auth/form?user_id={userId}` (No Auth Required)
 
-Submit or update user profile information including personal details, dependents, credit cards, and precious metals holdings.
-
-**Note:** If the user has no financial data (accounts, transactions, investments, liabilities), this endpoint will automatically generate realistic financial data for them, including 2-5 accounts with 6 months of transaction history, 3-8 investments, and 0-3 liabilities.
+Submit or update user profile information.
 
 Request:
 ```json
@@ -314,32 +334,8 @@ Request:
   "city": "Mumbai",
   "state": "Maharashtra",
   "pincode": "400001",
-  "dependents": [
-    {
-      "name": "Priya Sharma",
-      "age": 32,
-      "sex": "FEMALE",
-      "relationship": "Spouse"
-    },
-    {
-      "name": "Aryan Sharma",
-      "age": 8,
-      "sex": "MALE",
-      "relationship": "Son"
-    }
-  ],
-  "creditCards": [
-    {
-      "bankName": "HDFC Bank",
-      "cardType": "VISA",
-      "cardVariant": "Regalia"
-    },
-    {
-      "bankName": "ICICI Bank",
-      "cardType": "MASTERCARD",
-      "cardVariant": "Coral"
-    }
-  ],
+  "dependents": [...],
+  "creditCards": [...],
   "goldGrams": 50,
   "silverGrams": 500
 }
@@ -351,32 +347,11 @@ Response:
   "success": true,
   "message": "User information updated successfully",
   "data": {
-    "user": {
-      "id": "mongodb_id",
-      "name": "Rahul Sharma",
-      "email": "rahul.sharma@example.com",
-      "mobile": "9876543210",
-      "pan": "ABCDE1234F",
-      "address": "123, Sector 5, Street, Mumbai, Maharashtra",
-      "city": "Mumbai",
-      "state": "Maharashtra",
-      "pincode": "400001",
-      "dependents": [...],
-      "creditCards": [...],
-      "preciousMetals": { "gold": 50, "silver": 500 }
-    },
-    "financialDataGenerated": true
+    "user": {...},
+    "financialDataGenerated": false
   }
 }
 ```
-
-The `financialDataGenerated` field will be `true` if financial data was automatically generated, `false` otherwise.
-
-##### List All Users
-
-**GET** `/auth/users` (Public - for testing)
-
-Returns all generated users for easy testing access.
 
 ---
 
@@ -384,7 +359,10 @@ Returns all generated users for easy testing access.
 
 ##### Get All Accounts
 
-**GET** `/accounts` (Protected)
+**GET** `/accounts?user_id={userId}` (No Auth Required)
+
+Query Parameters:
+- `user_id` (required): MongoDB _id from `/auth/users`
 
 Response:
 ```json
@@ -413,9 +391,12 @@ Response:
 
 ##### Get Account by ID
 
-**GET** `/accounts/:accountId` (Protected)
+**GET** `/accounts/:accountId?user_id={userId}` (No Auth Required)
 
 Returns detailed account information including profile, summary, and transaction count.
+
+Query Parameters:
+- `user_id` (required): MongoDB _id from `/auth/users`
 
 ---
 
@@ -423,7 +404,10 @@ Returns detailed account information including profile, summary, and transaction
 
 ##### Get Net Worth
 
-**GET** `/aggregated/net-worth` (Protected)
+**GET** `/aggregated/net-worth?user_id={userId}` (No Auth Required)
+
+Query Parameters:
+- `user_id` (required): MongoDB _id from `/auth/users`
 
 Response includes precious metals valuation:
 ```json
@@ -475,14 +459,17 @@ Response includes precious metals valuation:
 
 ##### Get Transactions
 
-**GET** `/aggregated/transactions?from=2023-06-01&to=2023-06-30&category=Food&limit=50&offset=0` (Protected)
+**GET** `/aggregated/transactions?user_id={userId}&from=2025-05-01&to=2025-11-30&category=Food&limit=50&offset=0` (No Auth Required)
 
 Query Parameters:
-- `from` (optional): Start date (ISO format)
-- `to` (optional): End date (ISO format)
+- `user_id` (required): MongoDB _id from `/auth/users`
+- `from` (optional): Start date (ISO format, use 2025 dates)
+- `to` (optional): End date (ISO format, use 2025 dates)
 - `category` (optional): Filter by category
 - `limit` (optional): Results per page (default: 100)
 - `offset` (optional): Pagination offset (default: 0)
+
+**Note:** Transaction data is generated for May-November 2025, so use dates in this range.
 
 Response:
 ```json
@@ -521,25 +508,38 @@ Response:
 
 ##### Get Investments
 
-**GET** `/aggregated/investments` (Protected)
+**GET** `/aggregated/investments?user_id={userId}` (No Auth Required)
+
+Query Parameters:
+- `user_id` (required): MongoDB _id from `/auth/users`
 
 Response includes mutual funds, stocks, PPF, EPF, NPS, and fixed deposits.
 
 ##### Get Liabilities
 
-**GET** `/aggregated/liabilities` (Protected)
+**GET** `/aggregated/liabilities?user_id={userId}` (No Auth Required)
+
+Query Parameters:
+- `user_id` (required): MongoDB _id from `/auth/users`
 
 Response includes credit cards, personal loans, home loans, car loans, and education loans.
 
 ##### Get Monthly Spending
 
-**GET** `/aggregated/monthly-spending?months=6` (Protected)
+**GET** `/aggregated/monthly-spending?user_id={userId}&months=6` (No Auth Required)
+
+Query Parameters:
+- `user_id` (required): MongoDB _id from `/auth/users`
+- `months` (optional): Number of months (default: 6)
 
 Returns month-wise spending breakdown with category analysis.
 
 ##### Get Income Sources
 
-**GET** `/aggregated/income-sources` (Protected)
+**GET** `/aggregated/income-sources?user_id={userId}` (No Auth Required)
+
+Query Parameters:
+- `user_id` (required): MongoDB _id from `/auth/users`
 
 Returns income breakdown by category with percentages.
 
@@ -547,59 +547,40 @@ Returns income breakdown by category with percentages.
 
 ## Usage Examples
 
-### Example 1: Login and Get Net Worth
+### Example 1: Get Users and Query Net Worth
 
 ```bash
-# Step 1: Get list of test users
-curl http://localhost:3000/api/v1/auth/users
+# Step 1: Get list of all users
+curl https://anumati.thisisdhruv.in/api/v1/auth/users
 
-# Step 2: Login with a test user
-curl -X POST http://localhost:3000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "aaHandle": "9876543210@anumati",
-    "pin": "1234"
-  }'
+# Step 2: Pick a user_id from response (e.g., 692a430fbecb32675be14c9a)
 
-# Save the token from response
-
-# Step 3: Get net worth
-curl http://localhost:3000/api/v1/aggregated/net-worth \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+# Step 3: Get net worth for that user (NO AUTH REQUIRED!)
+curl "https://anumati.thisisdhruv.in/api/v1/aggregated/net-worth?user_id=692a430fbecb32675be14c9a"
 ```
 
 ### Example 2: Get Transaction History
 
 ```bash
-# Get transactions for last month
-curl "http://localhost:3000/api/v1/aggregated/transactions?from=2025-10-01&to=2025-11-30" \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+# Get transactions for a user (use 2025 dates!)
+curl "https://anumati.thisisdhruv.in/api/v1/aggregated/transactions?user_id=692a430fbecb32675be14c9a&from=2025-05-01&to=2025-11-30&limit=10"
 
 # Filter by category
-curl "http://localhost:3000/api/v1/aggregated/transactions?category=Food" \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE"
+curl "https://anumati.thisisdhruv.in/api/v1/aggregated/transactions?user_id=692a430fbecb32675be14c9a&category=Food"
 ```
 
 ### Example 3: Using with JavaScript/TypeScript
 
 ```typescript
-// Login
-const loginResponse = await fetch('http://localhost:3000/api/v1/auth/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    aaHandle: '9876543210@anumati',
-    pin: '1234'
-  })
-});
+// Step 1: Get users
+const usersResponse = await fetch('https://anumati.thisisdhruv.in/api/v1/auth/users');
+const { data } = await usersResponse.json();
+const userId = data.users[0]._id; // Pick first user
 
-const { data } = await loginResponse.json();
-const token = data.token;
-
-// Get net worth
-const netWorthResponse = await fetch('http://localhost:3000/api/v1/aggregated/net-worth', {
-  headers: { 'Authorization': `Bearer ${token}` }
-});
+// Step 2: Get net worth (NO AUTH NEEDED!)
+const netWorthResponse = await fetch(
+  `https://anumati.thisisdhruv.in/api/v1/aggregated/net-worth?user_id=${userId}`
+);
 
 const netWorthData = await netWorthResponse.json();
 console.log('Net Worth:', netWorthData.data.netWorth);
@@ -610,22 +591,34 @@ console.log('Net Worth:', netWorthData.data.netWorth);
 ```python
 import requests
 
-# Login
-login_response = requests.post('http://localhost:3000/api/v1/auth/login', json={
-    'aaHandle': '9876543210@anumati',
-    'pin': '1234'
-})
+BASE_URL = 'https://anumati.thisisdhruv.in/api/v1'
 
-token = login_response.json()['data']['token']
+# Step 1: Get users
+users_response = requests.get(f'{BASE_URL}/auth/users')
+user_id = users_response.json()['data']['users'][0]['_id']
 
-# Get accounts
+# Step 2: Get accounts (NO AUTH NEEDED!)
 accounts_response = requests.get(
-    'http://localhost:3000/api/v1/accounts',
-    headers={'Authorization': f'Bearer {token}'}
+    f'{BASE_URL}/accounts',
+    params={'user_id': user_id}
 )
 
 accounts = accounts_response.json()['data']['accounts']
 print(f"Total accounts: {len(accounts)}")
+
+# Step 3: Get transactions with date filter (use 2025 dates!)
+transactions_response = requests.get(
+    f'{BASE_URL}/aggregated/transactions',
+    params={
+        'user_id': user_id,
+        'from': '2025-05-01',
+        'to': '2025-11-30',
+        'limit': 10
+    }
+)
+
+transactions = transactions_response.json()['data']['transactions']
+print(f"Recent transactions: {len(transactions)}")
 ```
 
 ---
@@ -839,39 +832,52 @@ ICIC0002345
 
 ## Testing
 
-### Default Credentials
+### No Authentication Required! 🎉
 
-All generated users have:
-- **PIN**: `1234`
-- **AA Handle**: `{mobile}@anumati`
+This API runs in **no-auth mode** for easy testing and AI agent integration. No login or tokens needed!
+
+### Pre-loaded Test Users
+
+The API comes with **11 pre-loaded users** with complete financial data:
+- Each user has 2-5 bank accounts
+- 300+ transactions per account (May-Nov 2025)
+- 3-8 investments (mutual funds, stocks, PPF, NPS, FDs)
+- 0-3 liabilities (credit cards, loans)
 
 ### Getting Test Users
 
 ```bash
-# List all available test users
-curl http://localhost:3000/api/v1/auth/users
+# List all 11 available test users
+curl https://anumati.thisisdhruv.in/api/v1/auth/users
 ```
 
-This will return all generated users with their AA handles for easy login testing.
+This returns all users with their MongoDB `_id` values that you'll use for querying.
 
 ### Sample Test Flow
 
 ```bash
 # 1. Health check
-curl http://localhost:3000/api/v1/health
+curl https://anumati.thisisdhruv.in/api/v1/health
 
-# 2. List users
-curl http://localhost:3000/api/v1/auth/users
+# 2. List users and get their IDs
+curl https://anumati.thisisdhruv.in/api/v1/auth/users
 
-# 3. Login
-curl -X POST http://localhost:3000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"aaHandle": "USER_AA_HANDLE", "pin": "1234"}'
+# 3. Pick a user_id from the response (e.g., 692a430fbecb32675be14c9a)
 
-# 4. Test protected endpoints with token
-curl http://localhost:3000/api/v1/aggregated/net-worth \
-  -H "Authorization: Bearer YOUR_TOKEN"
+# 4. Query ANY endpoint with user_id (NO AUTH REQUIRED!)
+curl "https://anumati.thisisdhruv.in/api/v1/aggregated/net-worth?user_id=692a430fbecb32675be14c9a"
+
+curl "https://anumati.thisisdhruv.in/api/v1/aggregated/transactions?user_id=692a430fbecb32675be14c9a&from=2025-05-01&to=2025-11-30&limit=10"
+
+curl "https://anumati.thisisdhruv.in/api/v1/accounts?user_id=692a430fbecb32675be14c9a"
 ```
+
+### Important Notes
+
+- **No Authorization headers needed** - Just add `?user_id=` to any endpoint
+- **Use 2025 dates** for transaction queries (data is from May-Nov 2025)
+- All user IDs are MongoDB ObjectIds (24-character hex strings)
+- Each user has unique financial data
 
 ---
 
@@ -1001,12 +1007,12 @@ All API responses follow a consistent format:
 
 ## Security Features
 
-1. **JWT Authentication**: Stateless token-based auth
-2. **PIN Hashing**: Bcrypt with salt rounds
-3. **Rate Limiting**: 100 requests per 15 minutes per IP
-4. **CORS**: Configurable origin restrictions
-5. **Helmet.js**: Security HTTP headers
-6. **Input Validation**: Joi schemas for request validation
+1. **No Authentication Mode**: Easy access for testing and AI agents (authentication bypassed)
+2. **Rate Limiting**: 100 requests per 15 minutes per IP
+3. **CORS**: Configurable origin restrictions (currently allows all origins)
+4. **Helmet.js**: Security HTTP headers
+5. **Input Validation**: Joi schemas for request validation
+6. **MongoDB Security**: Secure connection to MongoDB Atlas with IP whitelisting
 
 ---
 
@@ -1024,10 +1030,10 @@ All API responses follow a consistent format:
 ## Limitations
 
 1. **Mock Data**: All financial data is generated using faker.js
-2. **Simplified Authentication**: PIN-based login for testing purposes
-3. **Mock OTP**: Always accepts '1234' for testing
-4. **No Real Banking Integration**: All data is generated
-5. **Simplified Encryption**: FI data encryption is simulated
+2. **No Authentication**: All endpoints are public for easy testing (not suitable for production with real data)
+3. **No Real Banking Integration**: All data is generated
+4. **Fixed Date Range**: Transactions are generated for May-November 2025 only
+5. **Pre-loaded Users**: Limited to 11 pre-generated users (can be regenerated with clear-db script)
 
 ---
 
@@ -1148,6 +1154,14 @@ For issues, questions, or suggestions:
 ---
 
 ## Changelog
+
+### v2.1.0 (2025-11-29)
+- **No Authentication Mode**: Removed JWT authentication for easy AI agent access
+- All endpoints now public with `?user_id=` query parameter
+- 11 pre-loaded users with unique MongoDB ObjectIds
+- Production deployment at https://anumati.thisisdhruv.in
+- Transaction data generated for May-November 2025
+- Simplified API usage - no tokens or login required
 
 ### v2.0.0 (2025-11-29)
 - MongoDB integration for data persistence

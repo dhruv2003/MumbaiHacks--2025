@@ -20,31 +20,25 @@ export const isMasterUser = (aaHandle: string): boolean => {
 
 export const authenticateToken = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    // NO-AUTH MODE: Skip all authentication for easy AI agent access
+    
+    // Create a mock master user for all requests
+    req.user = {
+      userId: '692a1b6332c754e3cdfc4a51',
+      aaHandle: '9999999999@anumati',
+      mobile: '9999999999'
+    };
 
-    if (!token) {
-      res.status(401).json({
-        success: false,
-        error: 'Access token is missing'
-      });
-      return;
-    }
-
-    const payload = AuthService.verifyToken(token);
-    req.user = payload;
-
-    // Log master user access
-    if (isMasterUser(payload.aaHandle)) {
-      const queryUserId = req.query.user_id || req.body.user_id;
-      logger.info(`🔑 Master user access: ${payload.aaHandle} ${queryUserId ? `querying user_id: ${queryUserId}` : '(own data)'}`);
-    }
+    // Log access for audit trail (optional)
+    const userId = req.query.user_id || req.body.user_id || 'none';
+    logger.info(`🔓 No-auth access: user_id=${userId} endpoint=${req.path}`);
 
     next();
   } catch (error) {
-    res.status(403).json({
+    logger.error('Authentication error:', error);
+    res.status(500).json({
       success: false,
-      error: 'Invalid or expired token'
+      error: 'Server error'
     });
   }
 };

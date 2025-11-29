@@ -1,26 +1,21 @@
-# Financial Data API Integration Guide
+# Financial Data API Integration Guide - NO AUTH REQUIRED! 🚀
 
 You have access to a Mock Anumati Account Aggregator API that provides realistic Indian financial data. Use this API to fetch user financial information including bank accounts, transactions, investments, and liabilities.
 
-## Authentication
+## 🔓 NO AUTHENTICATION NEEDED!
 
-### Login Credentials
-- **AA Handle**: `9999999999@anumati`
-- **PIN**: `9999`
+**Great news for AI agents**: This API runs in **no-auth mode** for easy integration! 
 
-### Step 1: Authenticate and Get Access Token
+- ❌ **No login required**
+- ❌ **No tokens needed** 
+- ❌ **No authentication headers**
+- ✅ **Direct API access**
+- ✅ **Simple GET/POST requests**
 
-Make a POST request to login:
+## Base URL
 
 ```
-Endpoint: {BASE_URL}/api/v1/auth/login
-Method: POST
-Headers: Content-Type: application/json
-Body:
-{
-  "aaHandle": "9999999999@anumati",
-  "pin": "9999"
-}
+Production: https://anumati.thisisdhruv.in
 ```
 
 **Response Structure:**
@@ -46,24 +41,13 @@ Body:
 - `token` - Required for authentication in all API calls
 - `_id` - Used to query specific users' data (master user only)
 
-## Making Authenticated Requests
+## How to Use the API
 
-For all API calls below, include the authentication token in the header:
+🎯 **Simple 2-Step Process:**
+
+### Step 1: Get List of Available Users
 ```
-Authorization: Bearer {token}
-```
-
-## Master User Capabilities
-
-🔑 **The master user has special privileges to query ANY user's data!**
-
-⚠️ **IMPORTANT: Master user has NO financial data of its own. You MUST always provide a `user_id` parameter to access actual user data.**
-
-### Required Workflow for Every Request
-
-**Step 1: Get List of All Users** (Do this FIRST, always)
-```
-GET {BASE_URL}/api/v1/auth/users
+GET https://anumati.thisisdhruv.in/api/v1/auth/users
 ```
 
 **Response:**
@@ -88,43 +72,45 @@ GET {BASE_URL}/api/v1/auth/users
 }
 ```
 
-**Step 2: Select a User's `_id` from the List**
+### Step 2: Query Any User's Data
 
-Choose the `_id` of the user whose data you want to access.
+Use any user's `_id` from step 1 to get their financial data:
 
-**Step 3: Query with `user_id` Parameter** (REQUIRED!)
+```bash
+# Get any user's net worth
+GET https://anumati.thisisdhruv.in/api/v1/aggregated/net-worth?user_id={USER_ID}
 
+# Get any user's accounts  
+GET https://anumati.thisisdhruv.in/api/v1/accounts?user_id={USER_ID}
+
+# Get any user's transactions
+GET https://anumati.thisisdhruv.in/api/v1/aggregated/transactions?user_id={USER_ID}
 ```
-GET {BASE_URL}/api/v1/aggregated/net-worth?user_id=67694b05d5dfe0a25ad42e6e
-GET {BASE_URL}/api/v1/accounts?user_id=67694b05d5dfe0a25ad42e6e
-GET {BASE_URL}/api/v1/aggregated/transactions?user_id=67694b05d5dfe0a25ad42e6e
-```
 
-### ⚠️ Critical Rules
+### ✅ Simple Rules
 
-- 🚫 **NEVER query without `user_id` parameter** - Master user has no data
-- ✅ **ALWAYS call `/auth/users` first** - Get the list of available users
-- ✅ **ALWAYS add `?user_id={_id}`** - Every data endpoint requires this
-- ❌ **Regular users CANNOT query other users** - Will receive 403 Forbidden
-- 📝 **All master user access is logged** - Audit trail for security
+- 🔓 **No authentication required** - Just make HTTP requests
+- ✅ **Use any user's `_id` from the users list** - Access anyone's financial data
+- ✅ **All endpoints work with `?user_id=` parameter** 
+- 📊 **11 users available** - Realistic financial data for each
 
 ## Available Endpoints
 
 ### 1. Get User Profile
 ```
-GET {BASE_URL}/api/v1/auth/profile?user_id={USER_ID}  (⚠️ user_id REQUIRED for master user)
+GET https://anumati.thisisdhruv.in/api/v1/auth/profile?user_id={USER_ID}
 ```
 Returns: User's personal information, KYC details, dependents, credit cards, and precious metals holdings.
 
 ### 2. Get All Bank Accounts
 ```
-GET {BASE_URL}/api/v1/accounts?user_id={USER_ID}  (⚠️ user_id REQUIRED for master user)
+GET https://anumati.thisisdhruv.in/api/v1/accounts?user_id={USER_ID}
 ```
 Returns: List of all linked bank accounts with balances, account types, and recent transactions.
 
 ### 3. Get Net Worth Summary
 ```
-GET {BASE_URL}/api/v1/aggregated/net-worth?user_id={USER_ID}  (⚠️ user_id REQUIRED for master user)
+GET https://anumati.thisisdhruv.in/api/v1/aggregated/net-worth?user_id={USER_ID}
 ```
 Returns: Complete financial overview including:
 - Total assets (bank accounts, investments, precious metals)
@@ -134,9 +120,9 @@ Returns: Complete financial overview including:
 
 ### 4. Get All Transactions
 ```
-GET {BASE_URL}/api/v1/aggregated/transactions?user_id={USER_ID}  (⚠️ user_id REQUIRED for master user)
+GET https://anumati.thisisdhruv.in/api/v1/aggregated/transactions?user_id={USER_ID}
 Query Parameters:
-- user_id: Query specific user's data (⚠️ REQUIRED for master user)
+- user_id: User's _id from the users list (REQUIRED)
 - from: Filter transactions from this date (YYYY-MM-DD)
 - to: Filter transactions until this date (YYYY-MM-DD)
 - category: Filter by category (groceries, entertainment, etc.)
@@ -155,7 +141,7 @@ Returns: Comprehensive list of all transactions across all accounts with categor
 
 ### 5. Get All Investments
 ```
-GET {BASE_URL}/api/v1/aggregated/investments?user_id={USER_ID}  (⚠️ user_id REQUIRED for master user)
+GET https://anumati.thisisdhruv.in/api/v1/aggregated/investments?user_id={USER_ID}
 ```
 Returns: Portfolio of investments including:
 - Mutual funds
@@ -167,7 +153,7 @@ Returns: Portfolio of investments including:
 
 ### 6. Get All Liabilities
 ```
-GET {BASE_URL}/api/v1/aggregated/liabilities?user_id={USER_ID}  (⚠️ user_id REQUIRED for master user)
+GET https://anumati.thisisdhruv.in/api/v1/aggregated/liabilities?user_id={USER_ID}
 ```
 Returns: All loans and debts including:
 - Home loans
@@ -178,10 +164,10 @@ Returns: All loans and debts including:
 
 ### 7. Get List of All Users
 ```
-GET {BASE_URL}/api/v1/auth/users
+GET https://anumati.thisisdhruv.in/api/v1/auth/users
 ```
-Returns: List of all available user accounts with their IDs (no authentication required).
-**⚠️ CALL THIS ENDPOINT FIRST to get the `_id` values for querying specific users.**
+Returns: List of all available user accounts with their IDs.
+**💡 CALL THIS ENDPOINT FIRST to get the `_id` values for querying specific users.**
 
 ### 8. Submit User Form Data
 ```
