@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { login, setAuthToken } from "@/lib/api";
+import { login } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
 export function LoginCard() {
@@ -19,7 +19,6 @@ export function LoginCard() {
         const result = await login(aaHandle, pin);
 
         if (result.success && result.data) {
-            setAuthToken(result.data.token);
             router.push("/chat");
         } else {
             setError(result.error || "Login failed. Please check your credentials.");

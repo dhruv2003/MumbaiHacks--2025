@@ -7,6 +7,7 @@ import { PaymentModal } from "@/components/payment/PaymentModal";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getNetWorth, getTransactions, formatCurrency, formatDate, clearUserId } from "@/lib/api";
+import { MessageSquare, BarChart3, TrendingUp, CreditCard, User, LogOut, ArrowUpRight, ArrowDownRight } from "lucide-react";
 
 export default function ChatPage() {
     const router = useRouter();
