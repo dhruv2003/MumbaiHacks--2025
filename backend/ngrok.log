@@ -1,0 +1,42 @@
+t=2025-11-29T10:47:33+0530 lvl=info msg="no configuration paths supplied"
+t=2025-11-29T10:47:33+0530 lvl=info msg="using configuration at default config path" path="/Users/madhavpatel/Library/Application Support/ngrok/ngrok.yml"
+t=2025-11-29T10:47:33+0530 lvl=info msg="open config file" path="/Users/madhavpatel/Library/Application Support/ngrok/ngrok.yml" err=nil
+t=2025-11-29T10:47:33+0530 lvl=info msg="FIPS 140 mode" enabled=false
+t=2025-11-29T10:47:33+0530 lvl=info msg="starting web service" obj=web addr=127.0.0.1:4040 allow_hosts=[]
+t=2025-11-29T10:47:33+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2025-11-29T10:47:33+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2025-11-29T10:47:33+0530 lvl=info msg="started tunnel" obj=tunnels name=command_line addr=http://localhost:8000 url=https://saige-unemotive-su.ngrok-free.dev
+t=2025-11-29T10:48:17+0530 lvl=info msg="join connections" obj=join id=1512eff52a37 l=127.0.0.1:8000 r=[2401:4900:7dbc:5f82:a8a4:972c:91d:de68]:58705
+t=2025-11-29T10:49:00+0530 lvl=info msg="join connections" obj=join id=97456a1553b3 l=127.0.0.1:8000 r=[2401:4900:7dbc:5f82:a8a4:972c:91d:de68]:55570
+t=2025-11-29T10:49:13+0530 lvl=info msg="join connections" obj=join id=594c68146549 l=127.0.0.1:8000 r=[2401:4900:7dbc:5f82:a8a4:972c:91d:de68]:55580
+t=2025-11-29T10:57:16+0530 lvl=info msg="join connections" obj=join id=91c7e783c0f1 l=127.0.0.1:8000 r=[2401:4900:7dbc:5f82:a8a4:972c:91d:de68]:55764
+t=2025-11-29T10:57:42+0530 lvl=info msg="join connections" obj=join id=9a8f2525b310 l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:50127
+t=2025-11-29T10:59:59+0530 lvl=info msg="join connections" obj=join id=5b6331fae1f7 l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:50192
+t=2025-11-29T11:00:53+0530 lvl=info msg="join connections" obj=join id=f6cff492e65f l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:50209
+t=2025-11-29T11:05:44+0530 lvl=info msg="join connections" obj=join id=c5f363a39ebd l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:50323
+t=2025-11-29T11:06:12+0530 lvl=info msg="join connections" obj=join id=19b85e43c67e l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:50331
+t=2025-11-29T11:09:18+0530 lvl=info msg="join connections" obj=join id=c50f08d11d53 l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:50396
+t=2025-11-29T11:21:11+0530 lvl=info msg="join connections" obj=join id=0259b66b1c0c l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:50912
+t=2025-11-29T11:21:28+0530 lvl=info msg="join connections" obj=join id=408cfcdb14eb l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:50934
+t=2025-11-29T11:22:19+0530 lvl=info msg="join connections" obj=join id=5429ba5823fe l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:50944
+t=2025-11-29T11:22:37+0530 lvl=info msg="join connections" obj=join id=71374b32ffb1 l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:50947
+t=2025-11-29T11:25:37+0530 lvl=info msg="join connections" obj=join id=7e2bde6745a3 l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:51050
+t=2025-11-29T11:25:55+0530 lvl=info msg="join connections" obj=join id=7f651f0ff994 l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:51064
+t=2025-11-29T11:26:24+0530 lvl=info msg="join connections" obj=join id=491905fa1935 l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:51074
+t=2025-11-29T11:27:58+0530 lvl=info msg="join connections" obj=join id=d5888a301ca5 l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:51100
+t=2025-11-29T11:47:28+0530 lvl=info msg="join connections" obj=join id=ff08c5a57b76 l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:51732
+t=2025-11-29T11:47:48+0530 lvl=info msg="join connections" obj=join id=5730a3807851 l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:51742
+t=2025-11-29T11:57:03+0530 lvl=info msg="join connections" obj=join id=cc616b39671e l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:51868
+t=2025-11-29T11:58:14+0530 lvl=info msg="join connections" obj=join id=68004dde2f64 l=127.0.0.1:8000 r=[2401:4900:c313:a512:287f:f249:87c2:7dd0]:51871
+t=2025-11-29T11:59:59+0530 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=0553e8ac04a3 err="read EOF from remote peer"
+t=2025-11-29T12:00:05+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2025-11-29T12:00:05+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2025-11-29T12:00:14+0530 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=b93b78ae2d48 clientid=dd795bb6416ad186d4b91784ed32b9fb
+t=2025-11-29T12:03:29+0530 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=0553e8ac04a3 err="read EOF from remote peer"
+t=2025-11-29T12:03:30+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2025-11-29T12:03:30+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2025-11-29T12:03:54+0530 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=a309dd82f81b clientid=dd795bb6416ad186d4b91784ed32b9fb
+t=2025-11-29T12:07:19+0530 lvl=eror msg="session closed, starting reconnect loop" obj=tunnels.session obj=csess id=0553e8ac04a3 err="read EOF from remote peer"
+t=2025-11-29T12:07:20+0530 lvl=info msg="client session established" obj=tunnels.session
+t=2025-11-29T12:07:20+0530 lvl=info msg="tunnel session started" obj=tunnels.session
+t=2025-11-29T12:07:24+0530 lvl=eror msg="heartbeat timeout, terminating session" obj=tunnels.session obj=csess id=2e132e42b5db clientid=dd795bb6416ad186d4b91784ed32b9fb
