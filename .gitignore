@@ -58,3 +58,20 @@ ENV/
 # Data files (optional - remove if you need to commit these)
 data/*.json
 !data/.gitkeep
+
+# Documentation files (temporary/generated)
+**/API_README.md
+**/IMPLEMENTATION_SUMMARY.md
+**/INTEGRATION_GUIDE.md
+**/MIAMI_TRANSFORMATION.md
+**/ROUTES_GUIDE.md
+**/QUICK_FIX.md
+
+# Config files
+eslint.config.mjs
+next-env.d.ts
+
+# Lock files (optional - uncomment if you want to ignore)
+package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
